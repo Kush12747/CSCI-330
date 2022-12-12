@@ -1,0 +1,48 @@
+#! /bin/bash
+
+#checks file exist
+if [ -f "$FILE" ]; then
+	echo "$FILE does not exist"
+	exit 1
+fi
+
+#checks file is readable
+if [ ! -r "$1" ]; then
+	echo "$1 is not readable"
+    exit 2
+fi
+
+#declare arrays
+words=(`aspell list < $1`)
+correctWords=()
+wrongWords=()
+count=1
+
+#loop through array of words
+for i in ${words}; 
+do
+	#checks for incorrect words and lets user enter input
+	read -p "$i is misspelled. Press \"Enter\" to keep this spelling, or type a correction here: " correction
+
+	#if user enters a word then add it to the array
+	if [ "$correction" = "" ]; then
+		correct+=("$correction")
+		wrongWords+=("$i")
+	else
+		wrongWords[$count]=$i
+		correctWords[$count]=$correction
+	fi
+	
+count+=1 
+printf "\n"
+done
+
+#print the correct word and incorrect words from arrays
+c=1
+printf "MISSPELLED: %10s CORRECTIONS:"
+for i in ${words}; 
+do
+	printf "\n\n"
+	printf "${wrongWords[$c]} %17s ${correctWords[$c]}\n"
+c+=1
+done
